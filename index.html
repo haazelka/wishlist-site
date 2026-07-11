@@ -1408,10 +1408,14 @@
   async function applyClaimsToList(){
     const budget = selections.budget;
     const claims = await loadClaimsForBudget(budget);
+    const list = document.getElementById('giftList');
+    const claimedItems = [];
+
     document.querySelectorAll('#giftList .gift-check').forEach((row) => {
       const cb = row.querySelector('.gift-checkbox');
       const idx = Number(cb.dataset.index);
       const claim = claims[idx];
+      const li = row.closest('.gift-item');
       let noteEl = row.querySelector('.claim-note');
       if(claim){
         cb.checked = true;
@@ -1423,11 +1427,15 @@
           row.appendChild(noteEl);
         }
         noteEl.textContent = '— đã chọn bởi ' + claim.claimedByName;
+        claimedItems.push(li);
       } else {
         cb.disabled = false;
         if(noteEl) noteEl.remove();
       }
     });
+
+    // Move already-assigned items down to the bottom, keeping their relative order
+    claimedItems.forEach(li => list.appendChild(li));
   }
 
   async function setClaim(budget, index, itemText, claimed){
