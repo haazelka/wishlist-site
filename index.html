@@ -1174,21 +1174,38 @@
   }
 
   // ---------- SUMMARY (after clicking Done) ----------
-  function renderSummary(){
-    const checked = Array.from(document.querySelectorAll('#giftList .gift-checkbox:checked'));
-    const items = checked.map(cb => cb.closest('.gift-check').querySelector('.gift-text').textContent);
+  // Pulls every item this user has claimed across ALL budget tiers (not just the
+  // one currently on screen), so picking more from a different tier never drops
+  // items chosen earlier.
+  async function renderSummary(){
     const list = document.getElementById('summaryList');
     const subtitle = document.getElementById('summarySubtitle');
     const displayName = selections.name && selections.name.trim() ? selections.name.trim() : "bạn";
 
+    if(!currentUser){
+      subtitle.textContent = "Bạn cần đăng nhập để xem những món đã chọn.";
+      list.innerHTML = '<li class="gift-empty">Đăng nhập rồi tick lại vài món xem sao!</li>';
+      return;
+    }
+
     subtitle.textContent = "Cảm ơn " + displayName + "! Đây là những món bạn đã nhận:";
 
-    if(items.length){
-      list.innerHTML = items.map((item, i) =>
-        '<li class="gift-item static"><span class="idx">' + String(i+1).padStart(2,'0') + '</span><span class="gift-text">' + item + '</span></li>'
-      ).join('');
-    } else {
-      list.innerHTML = '<li class="gift-empty">Bạn chưa tick món nào cả — quay lại chọn thử xem!</li>';
+    try{
+      const q = query(collection(db, 'claims'), where('claimedByUid', '==', currentUser.uid));
+      const snap = await getDocs(q);
+      const items = [];
+      snap.forEach(d => items.push(d.data().itemText));
+
+      if(items.length){
+        list.innerHTML = items.map((item, i) =>
+          '<li class="gift-item static"><span class="idx">' + String(i+1).padStart(2,'0') + '</span><span class="gift-text">' + item + '</span></li>'
+        ).join('');
+      } else {
+        list.innerHTML = '<li class="gift-empty">Bạn chưa tick món nào cả — quay lại chọn thử xem!</li>';
+      }
+    } catch(err){
+      list.innerHTML = '<li class="gift-empty">Không tải được danh sách, thử lại nhé.</li>';
+      console.error(err);
     }
   }
 
