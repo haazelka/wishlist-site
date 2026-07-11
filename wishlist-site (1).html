@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hướng Dẫn Sử Dụng: Diệp Chi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1B2340;
+    --navy-deep: #12172C;
+    --paper: #F7F3EA;
+    --paper-dim: #E9E3D6;
+    --coral: #FF6F91;
+    --coral-deep: #E85577;
+    --yellow: #F4C752;
+    --spotify: #1DB954;
+    --ink: #1B2340;
+    --display: 'Bricolage Grotesque', system-ui, sans-serif;
+    --body: 'Instrument Sans', system-ui, sans-serif;
+    --mono: 'Space Mono', monospace;
+
+    /* theme-swappable tokens: dark mode = cream outer field, light mode = navy outer field */
+    --stage-bg: var(--paper);
+    --grid-line: rgba(27,35,64,0.10);
+    --grid-opacity: 0.6;
+    --glow-1: rgba(255,111,145,0.14);
+    --glow-2: rgba(244,199,82,0.16);
+    --fixed-btn-bg: var(--ink);
+    --fixed-btn-fg: var(--paper);
+    --fixed-btn-border: var(--ink);
+    --doodle-opacity: 0.65;
+
+    /* sheet (card) colors: dark mode = navy card / paper text */
+    --sheet-bg: var(--navy);
+    --sheet-dim: #2A3358;
+    --sheet-text-rgb: 247,243,234;
+    --sheet-strong: var(--paper);
+    --sheet-strong-text: var(--ink);
+    --input-bg: #232C4D;
+  }
+
+  html[data-theme="light"]{
+    --stage-bg: var(--navy);
+    --grid-line: rgba(247,243,234,0.22);
+    --grid-opacity: 0.35;
+    --glow-1: rgba(255,111,145,0.10);
+    --glow-2: rgba(244,199,82,0.08);
+    --fixed-btn-bg: var(--paper);
+    --fixed-btn-fg: var(--ink);
+    --fixed-btn-border: var(--ink);
+    --doodle-opacity: 0.5;
+
+    /* sheet (card) colors: light mode = paper card / ink text */
+    --sheet-bg: var(--paper);
+    --sheet-dim: var(--paper-dim);
+    --sheet-text-rgb: 27,35,64;
+    --sheet-strong: var(--ink);
+    --sheet-strong-text: var(--paper);
+    --input-bg: #ffffff;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html,body{
+    margin:0; padding:0;
+    min-height:100%;
+    background: var(--stage-bg);
+    color: var(--paper);
+    font-family: var(--body);
+    transition: background 0.4s ease;
+  }
+
+  #stage{
+    position:relative;
+    width:100%;
+    min-height:100vh;
+    overflow:hidden;
+    background:
+      radial-gradient(circle at 15% 10%, var(--glow-1), transparent 40%),
+      radial-gradient(circle at 85% 85%, var(--glow-2), transparent 45%),
+      var(--stage-bg);
+    transition: background 0.4s ease;
+  }
+
+  /* faint blueprint grid, like a manual's technical sheet */
+  #stage::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 42px 42px;
+    opacity: var(--grid-opacity);
+    pointer-events:none;
+    transition: opacity 0.4s ease;
+  }
+
+  .page{
+    position:relative;
+    z-index:1;
+    display:none;
+    min-height:100vh;
+    width:100%;
+    align-items:center;
+    justify-content:center;
+    padding: 40px 20px;
+  }
+  .page.active{ display:flex; }
+
+  /* ---------- COVER SHEET ---------- */
+  .sheet{
+    position:relative;
+    width:100%;
+    max-width: 640px;
+    background: var(--sheet-bg);
+    color: rgb(var(--sheet-text-rgb));
+    border-radius: 6px;
+    padding: 0;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.45), 0 2px 0 rgba(255,255,255,0.04) inset;
+    animation: rise 0.9s cubic-bezier(.2,.8,.2,1) both;
+    overflow:hidden;
+  }
+
+  @keyframes rise{
+    from{ opacity:0; transform: translateY(24px) scale(0.98); }
+    to{ opacity:1; transform: translateY(0) scale(1); }
+  }
+
+  .sheet-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding: 18px 26px;
+    border-bottom: 2px dashed var(--sheet-dim);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(var(--sheet-text-rgb),0.55);
+  }
+  .tag{
+    background: var(--sheet-strong);
+    color: var(--sheet-strong-text);
+    padding: 4px 9px;
+    border-radius: 3px;
+    font-weight:700;
+    border: none;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+  .tag:hover{ opacity: 0.8; }
+  .tag-floating{
+    position:absolute;
+    top:14px;
+    right:14px;
+    z-index:2;
+  }
+
+  .sheet-body{
+    padding: 46px 40px 40px;
+  }
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--coral-deep);
+    margin-bottom: 18px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:8px; height:8px;
+    background: var(--coral);
+    border-radius: 50%;
+    display:inline-block;
+    box-shadow: 0 0 0 4px rgba(255,111,145,0.18);
+  }
+
+  h1{
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(2.1rem, 6vw, 3.1rem);
+    line-height: 1.04;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+  h1 .accent{ color: var(--coral-deep); font-style: normal; }
+
+  .subtitle{
+    font-family: var(--mono);
+    font-size: 13px;
+    color: rgba(var(--sheet-text-rgb),0.6);
+    margin: 0 0 28px;
+    letter-spacing: 0.02em;
+  }
+
+  .intro{
+    font-size: 1.06rem;
+    line-height: 1.62;
+    color: rgba(var(--sheet-text-rgb),0.86);
+    max-width: 46ch;
+    margin: 0 0 32px;
+  }
+  .intro strong{ color: rgb(var(--sheet-text-rgb)); }
+
+  .spec-strip{
+    display:flex;
+    gap: 0;
+    border-top: 1px solid var(--sheet-dim);
+    border-bottom: 1px solid var(--sheet-dim);
+    margin-bottom: 34px;
+  }
+  .spec{ flex:1; padding: 14px 16px; border-right: 1px solid var(--sheet-dim); }
+  .spec:last-child{ border-right:none; }
+  .spec .k{
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(var(--sheet-text-rgb),0.48);
+    margin-bottom: 4px;
+  }
+  .spec .v{ font-family: var(--body); font-weight: 600; font-size: 13.5px; color: rgb(var(--sheet-text-rgb)); }
+
+  .actions{ display:flex; align-items:center; gap: 14px; flex-wrap: wrap; }
+
+  .btn{
+    font-family: var(--body);
+    font-weight: 600;
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 999px;
+    padding: 14px 26px;
+    display:inline-flex;
+    align-items:center;
+    gap: 9px;
+    text-decoration:none;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .btn:active{ transform: translateY(1px) scale(0.98); }
+
+  .btn-primary{ background: var(--sheet-strong); color: var(--sheet-strong-text); box-shadow: 0 8px 20px rgba(0,0,0,0.28); }
+  .btn-primary:hover{ background: var(--coral-deep); box-shadow: 0 10px 26px rgba(232,85,119,0.38); transform: translateY(-1px); }
+  .btn-primary svg{ transition: transform 0.25s ease; }
+  .btn-primary:hover svg{ transform: translateX(3px); }
+  .btn-primary:disabled{ background: var(--sheet-dim); color: rgba(var(--sheet-text-rgb),0.4); box-shadow:none; cursor:not-allowed; }
+  .btn-primary:disabled:hover{ transform:none; }
+
+  .btn-fb{
+    width: 48px; height:48px; padding:0; border-radius: 50%;
+    background: var(--sheet-bg); color: rgb(var(--sheet-text-rgb)); border: 2px solid rgb(var(--sheet-text-rgb));
+    display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .btn-fb:hover{ background: #1877F2; border-color:#1877F2; color:#fff; }
+
+  .stamp{ position:absolute; top: 130px; right: -18px; width: 108px; height: 108px; transform: rotate(11deg); opacity: 0.9; pointer-events:none; }
+
+  .sheet-footer{
+    font-family: var(--mono);
+    font-size: 10px;
+    color: rgba(var(--sheet-text-rgb),0.4);
+    padding: 14px 26px;
+    border-top: 2px dashed var(--sheet-dim);
+    display:flex;
+    justify-content:space-between;
+    letter-spacing:0.05em;
+  }
+
+  .doodle{ position:absolute; opacity: var(--doodle-opacity); z-index:0; transition: opacity 0.4s ease; }
+
+  /* ---------- STEP PAGE (placeholder) ---------- */
+  .step-sheet{ max-width: 520px; text-align:center; padding: 60px 40px; }
+  .step-sheet .eyebrow{ justify-content:center; }
+  .step-sheet h2{ font-family: var(--display); font-weight: 800; font-size: 1.9rem; margin: 0 0 14px; }
+  .step-sheet p{ color: rgba(var(--sheet-text-rgb),0.75); line-height:1.6; margin: 0 0 30px; }
+  .back-link{ font-family: var(--mono); font-size: 12px; color: rgba(var(--sheet-text-rgb),0.55); text-decoration:none; letter-spacing:0.04em; }
+  .back-link:hover{ color: var(--coral-deep); }
+
+  /* ---------- "WHAT KIND OF PERSON" PAGE ---------- */
+  .quiz-sheet{ max-width: 620px; padding: 48px 40px 40px; }
+  .quiz-sheet h2{
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+    margin: 0 0 8px;
+    letter-spacing:-0.01em;
+  }
+  .quiz-sub{
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: rgba(var(--sheet-text-rgb),0.55);
+    margin: 0 0 30px;
+  }
+
+  .option-list{ display:flex; flex-direction:column; gap:12px; margin-bottom: 30px; }
+
+  .option{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding: 16px 18px;
+    border: 2px solid var(--sheet-dim);
+    border-radius: 10px;
+    cursor:pointer;
+    background: transparent;
+    text-align:left;
+    font-family: var(--body);
+    transition: border-color 0.18s ease, background 0.18s ease, transform 0.12s ease;
+  }
+  .option:hover{ border-color: rgba(var(--sheet-text-rgb),0.35); }
+  .option.selected{ border-color: var(--coral-deep); background: rgba(255,111,145,0.08); }
+  .option:active{ transform: scale(0.995); }
+
+  .option-mark{
+    width: 22px; height:22px; border-radius:50%;
+    border: 2px solid rgba(var(--sheet-text-rgb),0.35);
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .option.selected .option-mark{ border-color: var(--coral-deep); background: var(--coral-deep); }
+  .option-mark svg{ opacity:0; transform: scale(0.6); transition: all 0.15s ease; }
+  .option.selected .option-mark svg{ opacity:1; transform: scale(1); }
+
+  .option-icon{
+    width:38px; height:38px;
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  .option-text{ font-size: 15px; line-height:1.4; color: rgb(var(--sheet-text-rgb)); font-weight:500; }
+
+  .quiz-actions{ display:flex; justify-content:space-between; align-items:center; }
+
+  .result-sheet{ text-align:left; }
+
+  .text-input{
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 8px;
+    border: 2px solid var(--sheet-dim);
+    font-family: var(--body);
+    font-size: 15px;
+    background: var(--input-bg);
+    color: rgb(var(--sheet-text-rgb));
+    transition: border-color 0.18s ease;
+  }
+  .text-input::placeholder{ color: rgba(var(--sheet-text-rgb),0.4); }
+  .text-input:focus{ outline:none; border-color: var(--coral-deep); }
+  .gift-list{
+    list-style:none;
+    margin: 0 0 30px;
+    padding: 0;
+    border-top: 1px solid var(--sheet-dim);
+  }
+  .gift-item{
+    padding: 0;
+    border-bottom: 1px dashed var(--sheet-dim);
+    font-size: 15px;
+    color: rgb(var(--sheet-text-rgb));
+  }
+  .gift-check{
+    display:flex;
+    align-items:center;
+    gap: 14px;
+    padding: 13px 2px;
+    cursor:pointer;
+    width:100%;
+  }
+  .gift-checkbox{
+    width: 18px;
+    height: 18px;
+    flex-shrink:0;
+    accent-color: var(--coral-deep);
+    cursor:pointer;
+  }
+  .gift-item .idx{
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--coral-deep);
+    flex-shrink:0;
+    width: 24px;
+    transition: opacity 0.15s ease;
+  }
+  .gift-text{ transition: opacity 0.15s ease; }
+  .gift-checkbox:checked ~ .idx,
+  .gift-checkbox:checked ~ .gift-text{
+    text-decoration: line-through;
+    opacity: 0.45;
+  }
+  .gift-item.static{
+    display:flex;
+    align-items:center;
+    gap: 14px;
+    padding: 13px 2px;
+  }
+  .gift-checkbox:disabled{ cursor: not-allowed; opacity: 0.6; }
+  .claim-note{
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: rgba(var(--sheet-text-rgb),0.45);
+    margin-left: auto;
+    padding-left: 10px;
+    white-space: nowrap;
+  }
+  .gift-empty{
+    color: rgba(var(--sheet-text-rgb),0.6);
+    font-size: 14.5px;
+    line-height:1.6;
+    padding: 20px 2px;
+  }
+  .qr-block{
+    margin: 0 0 30px;
+    text-align:center;
+    padding: 20px;
+    border: 2px dashed var(--sheet-dim);
+    border-radius: 10px;
+  }
+  .qr-block img{
+    width: 200px;
+    height: 200px;
+    display:block;
+    margin: 0 auto 10px;
+    border-radius: 6px;
+    image-rendering: pixelated;
+  }
+  .qr-block .qr-caption{
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color: rgba(var(--sheet-text-rgb),0.55);
+  }
+
+  /* ---------- FIXED CORNER CONTROLS ---------- */
+  .corner-controls{
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 50;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .theme-toggle{
+    width: 56px; height: 30px;
+    border-radius: 999px;
+    border: 2px solid var(--fixed-btn-border);
+    background: var(--fixed-btn-bg);
+    position:relative;
+    cursor:pointer;
+    padding: 0;
+    transition: background 0.3s ease;
+  }
+  .theme-toggle .knob{
+    position:absolute;
+    top: 2px; left: 2px;
+    width: 22px; height: 22px;
+    border-radius:50%;
+    background: var(--fixed-btn-fg);
+    color: var(--fixed-btn-bg);
+    display:flex; align-items:center; justify-content:center;
+    transition: left 0.28s cubic-bezier(.2,.8,.2,1), background 0.3s ease;
+  }
+  html[data-theme="light"] .theme-toggle .knob{ left: 28px; }
+  .theme-toggle .knob svg{ width:13px; height:13px; }
+
+  .account-btn{
+    height: 30px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 2px solid var(--fixed-btn-border);
+    background: var(--fixed-btn-bg);
+    color: var(--fixed-btn-fg);
+    font-family: var(--body);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .account-btn:hover{ opacity: 0.85; }
+
+  .spotify-fab{
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
+    z-index: 50;
+    width: 56px; height:56px;
+    border-radius:50%;
+    background: var(--spotify);
+    color: #06120A;
+    border: none;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 10px 26px rgba(29,185,84,0.4);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .spotify-fab:hover{ transform: translateY(-2px) scale(1.04); box-shadow: 0 14px 32px rgba(29,185,84,0.5); }
+  .spotify-fab svg{ width:28px; height:28px; }
+
+  .toast-container{
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 200;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap: 8px;
+    pointer-events:none;
+  }
+  .toast{
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 10px 18px;
+    border-radius: 999px;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.35);
+    opacity: 0;
+    transform: translateY(10px);
+    animation: toast-pop 1.6s ease forwards;
+    display:flex;
+    align-items:center;
+    gap: 8px;
+  }
+  .toast::before{
+    content:"✓";
+    color: var(--coral);
+    font-weight:700;
+  }
+  @keyframes toast-pop{
+    0%{ opacity:0; transform: translateY(10px) scale(0.9); }
+    12%{ opacity:1; transform: translateY(0) scale(1); }
+    80%{ opacity:1; transform: translateY(0) scale(1); }
+    100%{ opacity:0; transform: translateY(-8px) scale(0.95); }
+  }
+
+  /* ---------- SPOTIFY MODAL ---------- */
+  .modal-overlay{
+    position: fixed; inset:0;
+    background: rgba(10,12,24,0.6);
+    backdrop-filter: blur(3px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index: 100;
+    padding: 20px;
+  }
+  .modal-overlay.active{ display:flex; }
+
+  .modal-card{
+    width:100%;
+    max-width: 420px;
+    background: var(--sheet-bg);
+    color: rgb(var(--sheet-text-rgb));
+    border-radius: 12px;
+    overflow:hidden;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.5);
+    animation: rise 0.35s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .modal-head{
+    display:flex; justify-content:space-between; align-items:center;
+    padding: 16px 20px;
+    border-bottom: 2px dashed var(--sheet-dim);
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color: rgba(var(--sheet-text-rgb),0.55);
+  }
+  .modal-close{
+    background:none; border:none; cursor:pointer;
+    color: rgba(var(--sheet-text-rgb),0.5);
+    width:26px; height:26px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:50%;
+  }
+  .modal-close:hover{ background: var(--sheet-dim); color: rgb(var(--sheet-text-rgb)); }
+
+  .modal-body{ padding: 22px 22px 26px; }
+  .modal-body label{
+    display:block;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color: rgba(var(--sheet-text-rgb),0.5);
+    margin-bottom: 8px;
+  }
+  .spotify-input-row{ display:flex; gap:8px; margin-bottom: 16px; }
+  .spotify-input-row input{
+    flex:1;
+    padding: 11px 14px;
+    border-radius: 8px;
+    border: 2px solid var(--sheet-dim);
+    font-family: var(--body);
+    font-size: 14px;
+    background: var(--input-bg);
+    color: rgb(var(--sheet-text-rgb));
+  }
+  .spotify-input-row input:focus{ outline:none; border-color: var(--spotify); }
+  .spotify-play-btn{
+    background: var(--spotify);
+    color: #06120A;
+    border:none;
+    border-radius:8px;
+    padding: 0 16px;
+    font-weight:700;
+    cursor:pointer;
+    font-family: var(--body);
+    font-size: 14px;
+  }
+  .spotify-play-btn:hover{ background: #1ed760; }
+
+  .spotify-hint{ font-size:12.5px; color: rgba(var(--sheet-text-rgb),0.5); margin: 0 0 4px; line-height:1.5; }
+
+  .auth-tabs{ display:flex; gap:8px; margin-bottom:18px; }
+  .auth-tab{
+    flex:1;
+    padding: 9px 0;
+    border-radius: 8px;
+    border: 2px solid var(--sheet-dim);
+    background: transparent;
+    color: rgba(var(--sheet-text-rgb),0.6);
+    font-family: var(--body);
+    font-weight:600;
+    font-size: 13.5px;
+    cursor:pointer;
+  }
+  .auth-tab.active{
+    border-color: var(--coral-deep);
+    color: var(--coral-deep);
+    background: rgba(255,111,145,0.08);
+  }
+  .spotify-error{ font-size:12.5px; color: var(--coral-deep); margin: 0 0 10px; display:none; }
+  .spotify-embed-wrap{ margin-top: 14px; }
+  .spotify-embed-wrap iframe{ display:block; width:100%; border:none; border-radius:12px; }
+
+  @media (max-width: 520px){
+    .sheet-body{ padding: 34px 24px 30px; }
+    .spec-strip{ flex-direction:column; }
+    .spec{ border-right:none; border-bottom:1px solid var(--sheet-dim); }
+    .spec:last-child{ border-bottom:none; }
+    .stamp{ display:none; }
+    .quiz-sheet{ padding: 38px 22px 30px; }
+    .corner-controls{ top: 12px; right: 12px; }
+    .spotify-fab{ bottom:16px; right:16px; width:50px; height:50px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .sheet, .modal-card{ animation:none; }
+    .btn, .btn-primary svg, .theme-toggle .knob{ transition:none; }
+  }
+
+  :focus-visible{ outline: 3px solid var(--yellow); outline-offset: 3px; }
+
+  .ink-stroke{ stroke: rgb(var(--sheet-text-rgb)); }
+  .ink-fill{ fill: rgb(var(--sheet-text-rgb)); }
+</style>
+</head>
+<body>
+
+<!-- fixed corner controls: theme toggle -->
+<div class="corner-controls">
+  <button class="theme-toggle" id="themeToggle" aria-label="Chuyển chế độ sáng / tối">
+    <span class="knob" id="themeKnob">
+      <svg viewBox="0 0 24 24" fill="none" id="themeIcon">
+        <path d="M12 3a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0V4a1 1 0 0 1 1-1Zm0 15a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0v-1a1 1 0 0 1 1-1ZM4 11a1 1 0 0 1 1 1 1 1 0 1 1-2 0 1 1 0 0 1 1-1Zm15 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2ZM5.6 5.6a1 1 0 0 1 1.4 0l.7.7A1 1 0 1 1 6.3 7.7l-.7-.7a1 1 0 0 1 0-1.4Zm10.7 10.7a1 1 0 0 1 1.4 0l.7.7a1 1 0 0 1-1.4 1.4l-.7-.7a1 1 0 0 1 0-1.4ZM18.4 5.6a1 1 0 0 1 0 1.4l-.7.7a1 1 0 1 1-1.4-1.4l.7-.7a1 1 0 0 1 1.4 0ZM7.7 16.3a1 1 0 0 1 0 1.4l-.7.7a1 1 0 0 1-1.4-1.4l.7-.7a1 1 0 0 1 1.4 0ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z" fill="currentColor"/>
+      </svg>
+    </span>
+  </button>
+  <button class="account-btn" id="accountBtn" type="button">Đăng nhập</button>
+</div>
+
+<!-- fixed corner control: spotify -->
+<button class="spotify-fab" id="spotifyFab" aria-label="Mở nhạc nền Spotify">
+  <svg viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm4.59 14.4a.62.62 0 0 1-.86.21c-2.36-1.44-5.33-1.77-8.83-.97a.63.63 0 0 1-.28-1.23c3.83-.88 7.12-.5 9.76 1.12.3.18.4.57.21.87Zm1.22-2.72a.78.78 0 0 1-1.07.26c-2.7-1.66-6.82-2.14-10.02-1.17a.78.78 0 1 1-.46-1.5c3.65-1.11 8.19-.57 11.29 1.33.37.23.49.72.26 1.08Zm.11-2.83c-3.24-1.92-8.6-2.1-11.7-1.16a.94.94 0 1 1-.55-1.8c3.56-1.08 9.47-.87 13.2 1.34a.94.94 0 0 1-.95 1.62Z"/>
+  </svg>
+</button>
+
+<!-- spotify modal -->
+<div class="modal-overlay" id="spotifyModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <span>Nhạc nền · tuỳ chọn</span>
+      <button class="modal-close" id="spotifyClose" aria-label="Đóng">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 2L14 14M14 2L2 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p class="spotify-hint">Dán link 1 bài hát, album hay playlist Spotify vào đây để phát trong lúc xem hướng dẫn.</p>
+      <label for="spotifyInput">Link Spotify</label>
+      <div class="spotify-input-row">
+        <input type="text" id="spotifyInput" placeholder="https://open.spotify.com/track/...">
+        <button class="spotify-play-btn" id="spotifyPlayBtn">Phát</button>
+      </div>
+      <p class="spotify-error" id="spotifyError">Link này chưa đúng định dạng Spotify, thử lại nhé.</p>
+      <div class="spotify-embed-wrap" id="spotifyEmbedWrap"></div>
+    </div>
+  </div>
+</div>
+
+<!-- account modal -->
+<div class="modal-overlay" id="accountModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <span id="accountModalTitle">Đăng nhập</span>
+      <button class="modal-close" id="accountClose" aria-label="Đóng">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 2L14 14M14 2L2 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <!-- logged-out view -->
+      <div id="authForm">
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tabLogin" type="button">Đăng nhập</button>
+          <button class="auth-tab" id="tabSignup" type="button">Đăng ký</button>
+        </div>
+
+        <div id="signupNameRow" style="display:none;">
+          <label for="authName">Tên hiển thị</label>
+          <input type="text" id="authName" class="text-input" placeholder="Tên bạn muốn hiện" style="margin-bottom:14px;">
+        </div>
+
+        <label for="authEmail">Email</label>
+        <input type="email" id="authEmail" class="text-input" placeholder="ban@email.com" style="margin-bottom:14px;">
+
+        <label for="authPassword">Mật khẩu</label>
+        <input type="password" id="authPassword" class="text-input" placeholder="Ít nhất 6 ký tự" style="margin-bottom:16px;">
+
+        <p class="spotify-error" id="authError"></p>
+
+        <button class="spotify-play-btn" id="authSubmitBtn" style="width:100%; padding:12px 0; background:var(--sheet-strong); color:var(--sheet-strong-text);">Đăng nhập</button>
+      </div>
+
+      <!-- logged-in view -->
+      <div id="authLoggedIn" style="display:none;">
+        <p class="spotify-hint" id="loggedInHint"></p>
+        <button class="spotify-play-btn" id="logoutBtn" style="width:100%; padding:12px 0; background:var(--sheet-strong); color:var(--sheet-strong-text);">Đăng xuất</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div id="stage">
+
+  <!-- floating doodles -->
+  <svg class="doodle" style="top:8%; left:6%; width:70px;" viewBox="0 0 64 64" fill="none">
+    <rect x="14" y="26" width="36" height="28" rx="2" stroke="#F4C752" stroke-width="2"/>
+    <path d="M14 34H50" stroke="#F4C752" stroke-width="2"/>
+    <path d="M32 26V54" stroke="#F4C752" stroke-width="2"/>
+    <path d="M32 26c-6-10-18-6-14 2 3 6 14-2 14-2Z" stroke="#F4C752" stroke-width="2"/>
+    <path d="M32 26c6-10 18-6 14 2-3 6-14-2-14-2Z" stroke="#F4C752" stroke-width="2"/>
+  </svg>
+
+  <svg class="doodle" style="bottom:10%; left:9%; width:54px;" viewBox="0 0 64 64" fill="none">
+    <circle cx="32" cy="32" r="18" stroke="#FF6F91" stroke-width="2"/>
+    <path d="M32 50V60" stroke="#FF6F91" stroke-width="2"/>
+    <path d="M24 22c2-4 6-4 8 0M32 22c2-4 6-4 8 0" stroke="#FF6F91" stroke-width="2"/>
+  </svg>
+
+  <svg class="doodle" style="top:14%; right:8%; width:60px;" viewBox="0 0 64 64" fill="none">
+    <path d="M12 40c6 8 34 8 40 0" stroke="#F4C752" stroke-width="2"/>
+    <path d="M12 40c0-16 40-16 40 0" stroke="#F4C752" stroke-width="2"/>
+    <path d="M32 40V16" stroke="#FF6F91" stroke-width="2"/>
+    <circle cx="32" cy="12" r="4" stroke="#FF6F91" stroke-width="2"/>
+  </svg>
+
+  <svg class="doodle" style="bottom:6%; right:10%; width:80px;" viewBox="0 0 64 64" fill="none">
+    <path d="M8 50 L56 50" stroke="#FF6F91" stroke-width="2" stroke-dasharray="1 7" stroke-linecap="round"/>
+  </svg>
+
+  <!-- PAGE 1 : COVER -->
+  <section class="page active" id="page-cover">
+    <div class="sheet">
+      <div class="sheet-header">
+        <span>Gift Guide · No. 03</span>
+        <button class="tag home-tag" id="homeTagBtn" type="button">Handle with care</button>
+      </div>
+
+      <div class="sheet-body" style="position:relative;">
+
+        <svg class="stamp" viewBox="0 0 100 100">
+          <circle class="ink-stroke" cx="50" cy="50" r="46" fill="none" stroke="#1B2340" stroke-width="1.4" stroke-dasharray="4 4" opacity="0.55"/>
+          <path id="circlePath" d="M50,50 m-34,0 a34,34 0 1,1 68,0 a34,34 0 1,1 -68,0" fill="none"/>
+          <text class="ink-fill" font-family="Space Mono" font-size="6.6" letter-spacing="2" fill="#1B2340" opacity="0.6">
+            <textPath href="#circlePath" startOffset="0%">
+              SINH NHẬT · SINH NHẬT · SINH NHẬT ·
+            </textPath>
+          </text>
+          <circle cx="50" cy="50" r="6" fill="#FF6F91"/>
+        </svg>
+
+        <p class="eyebrow">Tài liệu hướng dẫn cá nhân</p>
+
+        <h1>Diệp Chi<br><span class="accent">aka Lyhn Ao, ka,</span><br>hay gì cũng được.</h1>
+        <p class="subtitle">MODEL: SINH-NHẬT-SẮP-TỚI · PHIÊN BẢN: DUY NHẤT</p>
+
+        <p class="intro">
+          yep sinh nhật t sắp tới rồi <strong>(cụ thể là ngày 4/9)</strong> nên làm ơn hãy tiêu tiền
+          vào những món sau đây <em>(only if u r willing to give me some gift)</em>.
+        </p>
+
+        <div class="spec-strip">
+          <div class="spec"><div class="k">Thời lượng</div><div class="v">~2 phút</div></div>
+          <div class="spec"><div class="k">Độ khó</div><div class="v">ez</div></div>
+          <div class="spec"><div class="k">Yêu cầu</div><div class="v">Một chút thành ý</div></div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="startBtn">
+            Bắt đầu
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 8H14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M9 3L14 8L9 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <a class="btn btn-fb" id="fbBtn" href="https://web.facebook.com/people/Di%E1%BB%87p-Chi/pfbid09UoqAtmH3AcAMM78WN688XNoHCmJenMPD93zhsT4W1mqaTtN1aGfxGy6cCcsUZwzl/" target="_blank" rel="noopener" aria-label="Trang Facebook cá nhân">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.44 2.91h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94Z"/>
+            </svg>
+          </a>
+        </div>
+
+      </div>
+
+      <div class="sheet-footer">
+        <span>Bước 1 / còn tiếp</span>
+        <span>Đọc kỹ trước khi tặng</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 2 : "How should I call you?" -->
+  <section class="page" id="page-name">
+    <div class="sheet quiz-sheet">
+      <button class="tag home-tag tag-floating" type="button">Handle with care</button>
+      <p class="eyebrow">Bước 2 · Giới thiệu</p>
+      <h2>How should I call you?</h2>
+      <p class="quiz-sub">Gõ tên bạn muốn mình gọi (nickname cũng được).</p>
+
+      <div style="margin-bottom: 30px;">
+        <input type="text" id="nameInput" class="text-input" placeholder="Nhập tên của bạn...">
+      </div>
+
+      <div class="quiz-actions">
+        <a href="#" class="back-link" id="backLinkName">← quay lại trang bìa</a>
+        <button class="btn btn-primary" id="nameNextBtn" disabled>
+          Tiếp theo
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M2 8H14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M9 3L14 8L9 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 3 : "Số tiền bạn sẵn sàng dành ra" -->
+  <section class="page" id="page-budget">
+    <div class="sheet quiz-sheet">
+      <button class="tag home-tag tag-floating" type="button">Handle with care</button>
+      <p class="eyebrow">Bước 3 · Ngân sách</p>
+      <h2>Số tiền bạn sẵn sàng dành ra</h2>
+      <p class="quiz-sub">Không có đáp án sai đâu, cứ chọn thật lòng.</p>
+
+      <div class="option-list" id="budgetOptionList" data-group="budget">
+        <button class="option" data-value="anything">
+          <span class="option-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <path class="ink-stroke" d="M8 12c2-3 6-4 8-4s6 1 8 4" stroke="#1B2340" stroke-width="2" stroke-linecap="round"/>
+              <path class="ink-stroke" d="M8 20c2 3 6 4 8 4s6-1 8-4" stroke="#1B2340" stroke-width="2" stroke-linecap="round"/>
+              <circle class="ink-fill" cx="16" cy="16" r="1.4" fill="#1B2340"/>
+            </svg>
+          </span>
+          <span class="option-text">Gì cũng được</span>
+          <span class="option-mark"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </button>
+
+        <button class="option" data-value="mid">
+          <span class="option-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <path d="M6 22h20" stroke="#E85577" stroke-width="2" stroke-linecap="round"/>
+              <path d="M9 22V13l7-6 7 6v9" stroke="#E85577" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="option-text">Không hẹp nhưng đừng rộng quá</span>
+          <span class="option-mark"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </button>
+
+        <button class="option" data-value="meal">
+          <span class="option-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <path d="M10 6v10a2 2 0 0 0 4 0V6" stroke="#F4C752" stroke-width="2" stroke-linecap="round"/>
+              <path d="M12 16v10" stroke="#F4C752" stroke-width="2" stroke-linecap="round"/>
+              <path d="M21 6c-2 0-3 3-3 6s1 4 3 4v10" stroke="#F4C752" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="option-text">Idk, chắc bằng 1 bữa ăn</span>
+          <span class="option-mark"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </button>
+
+        <button class="option" data-value="lollipop">
+          <span class="option-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <circle cx="16" cy="11" r="7" stroke="#FF6F91" stroke-width="2"/>
+              <path d="M16 18v9" stroke="#FF6F91" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="option-text">Tầm 1 cái kẹo mút</span>
+          <span class="option-mark"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </button>
+      </div>
+
+      <div class="quiz-actions">
+        <a href="#" class="back-link" id="backLinkBudget">← quay lại bước trước</a>
+        <button class="btn btn-primary" id="budgetNextBtn" disabled>
+          Tiếp theo
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M2 8H14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M9 3L14 8L9 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 4 : gift results -->
+  <section class="page" id="page-result">
+    <div class="sheet quiz-sheet result-sheet">
+      <button class="tag home-tag tag-floating" type="button">Handle with care</button>
+      <p class="eyebrow" id="resultEyebrow">Bước 4 · Kết quả</p>
+      <h2>Gợi ý quà cho bạn</h2>
+      <p class="quiz-sub" id="resultSubtitle">Dựa trên lựa chọn của bạn.</p>
+
+      <ul class="gift-list" id="giftList"></ul>
+      <div id="giftExtra"></div>
+
+      <div style="text-align:center; margin-bottom: 26px;">
+        <button class="tag" id="doneBtn" type="button">Done</button>
+      </div>
+
+      <div class="quiz-actions" style="justify-content:flex-start;">
+        <a href="#" class="back-link" id="backLinkResult">← quay lại bước trước</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 5 : summary after Done -->
+  <section class="page" id="page-summary">
+    <div class="sheet quiz-sheet result-sheet">
+      <button class="tag home-tag tag-floating" type="button">Handle with care</button>
+      <p class="eyebrow">Bước 5 · Xác nhận</p>
+      <h2>Hooray, và nhiệm vụ của bạn là:</h2>
+      <p class="quiz-sub" id="summarySubtitle"></p>
+
+      <ul class="gift-list" id="summaryList"></ul>
+
+      <div style="text-align:center; margin-bottom: 6px;">
+        <button class="tag" id="chooseMoreBtn" type="button">Chọn thêm</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script type="module">
+  // ==========================================================================
+  // FIREBASE SETUP
+  // 1) Tạo project tại https://console.firebase.google.com
+  // 2) Bật Authentication > Sign-in method > Email/Password
+  // 3) Tạo Firestore Database (bắt đầu ở chế độ test hoặc tự set rules)
+  // 4) Project settings > General > "Your apps" > Web app > copy config vào đây
+  // ==========================================================================
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+    signOut, onAuthStateChanged, updateProfile
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getFirestore, doc, setDoc, deleteDoc, getDocs, collection, query, where, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBcWR6sxi4DBl6ZQqtsrViM7C3-R_5P_HU",
+    authDomain: "mymylittlepony-4b52d.firebaseapp.com",
+    databaseURL: "https://mymylittlepony-4b52d-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "mymylittlepony-4b52d",
+    storageBucket: "mymylittlepony-4b52d.firebasestorage.app",
+    messagingSenderId: "43178832244",
+    appId: "1:43178832244:web:cfefa333166d339a60bc21",
+    measurementId: "G-6CR7YJJQ2C"
+  };
+
+  const firebaseApp = initializeApp(firebaseConfig);
+  const auth = getAuth(firebaseApp);
+  const db = getFirestore(firebaseApp);
+
+  let currentUser = null;     // Firebase auth user object
+  let currentUserName = null; // display name shown to others
+  // ---------- PAGE NAVIGATION ----------
+  const pages = {
+    cover: document.getElementById('page-cover'),
+    name: document.getElementById('page-name'),
+    budget: document.getElementById('page-budget'),
+    result: document.getElementById('page-result'),
+    summary: document.getElementById('page-summary'),
+  };
+
+  function goTo(pageKey){
+    Object.values(pages).forEach(p => p.classList.remove('active'));
+    pages[pageKey].classList.add('active');
+    window.scrollTo(0,0);
+  }
+
+  document.getElementById('startBtn').addEventListener('click', () => goTo('name'));
+  document.querySelectorAll('.home-tag').forEach(btn => btn.addEventListener('click', () => goTo('cover')));
+  document.getElementById('backLinkName').addEventListener('click', (e) => { e.preventDefault(); goTo('cover'); });
+  document.getElementById('backLinkBudget').addEventListener('click', (e) => { e.preventDefault(); goTo('name'); });
+  document.getElementById('backLinkResult').addEventListener('click', (e) => { e.preventDefault(); goTo('budget'); });
+  document.getElementById('chooseMoreBtn').addEventListener('click', () => goTo('budget'));
+
+
+
+  // ---------- STATE ----------
+  const selections = { name: null, budget: null };
+
+  const budgetLabels = {
+    anything: "gì cũng được",
+    mid: "không hẹp nhưng đừng rộng quá",
+    meal: "bằng 1 bữa ăn",
+    lollipop: "tầm 1 cái kẹo mút"
+  };
+
+  // ---------- GIFT DATA ----------
+  // Key format: "<budget>". Add more combos here as they're provided.
+  const giftData = {
+    anything: [
+      "Ball cyan Cortis (chỉ cần quả bóng)",
+      "Box set KNY",
+      "Album Training Day – Longshot",
+      "Sticker Longshot",
+      "Mixtape 2 – Longshot",
+      "Magazine Longshot",
+      "Lightstick Cortis",
+      "Áo Adidas 4Shoville (custom)"
+    ],
+    mid: [
+      "Tiểu thuyết Ngõ Ngô Đồng",
+      "Tiểu thuyết Quả Ngọt Năm Tháng – tập 1 & 2",
+      "Móc khoá Official Turbo Bà Bà",
+      "Manga Darwin's Game – tập 1, 2, 3, 4",
+      "Boxset Monster 8",
+      "Kem dưỡng ẩm Torriden xanh dương"
+    ],
+    meal: [
+      "Death Note – tập 5",
+      "Death Note – tập 7",
+      "Văn phòng thám tử quái vật – tập 17",
+      "Văn phòng thám tử quái vật – tập 18",
+      "Black Clover – tập 1",
+      "Black Clover – tập 3",
+      "Black Clover – tập 5",
+      "Black Clover – tập 6",
+      "Black Clover – tập 7",
+      "Black Clover – tập 8",
+      "Black Clover – tập 9",
+      "Black Clover – tập 10",
+      "Black Clover – tập 11",
+      "Black Clover – tập 12",
+      "Black Clover – tập 13",
+      "Black Clover – tập 14",
+      "Black Clover – tập 15",
+      "Black Clover – tập 16",
+      "Black Clover – tập 17",
+      "Black Clover – tập 18",
+      "Black Clover – tập 19",
+      "Black Clover – tập 20",
+      "Black Clover – tập 21",
+      "Black Clover – tập 23",
+      "Black Clover – tập 25",
+      "Black Clover – tập 26",
+      "Black Clover – tập 27",
+      "Black Clover – tập 28",
+      "Black Clover – tập 30",
+      "Hồ sơ mật – tập 1",
+      "Hồ sơ mật – tập 2",
+      "Hồ sơ mật – tập 3",
+      "Hồ sơ mật – tập 4",
+      "Hồ sơ mật – tập 5",
+      "Hồ sơ mật – tập 6",
+      "Hồ sơ mật – tập 7",
+      "Hồ sơ mật – tập 8",
+      "Hồ sơ mật – tập 9",
+      "Hồ sơ mật – tập 10",
+      "Hồ sơ mật – tập 11",
+      "Vòng lặp thứ 7 của tiểu thư phản diện – tập 1",
+      "Vòng lặp thứ 7 của tiểu thư phản diện – tập 2",
+      "Vòng lặp thứ 7 của tiểu thư phản diện – tập 3",
+      "Vòng lặp thứ 7 của tiểu thư phản diện – tập 4",
+      "Vòng lặp thứ 7 của tiểu thư phản diện – tập 5",
+      "Vòng lặp thứ 7 của tiểu thư phản diện – tập 6",
+      "Vòng lặp thứ 7 của tiểu thư phản diện – tập 7",
+      "1 cái vision anemo (keychain) [un/off whatever]"
+    ],
+    lollipop: [
+      "At this point just bank me whatever you want to"
+    ]
+  };
+
+  const QR_BASE64 = "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";
+
+  function renderResult(){
+    const items = giftData[selections.budget];
+    const list = document.getElementById('giftList');
+    const extra = document.getElementById('giftExtra');
+    const subtitle = document.getElementById('resultSubtitle');
+    const displayName = selections.name && selections.name.trim() ? selections.name.trim() : "bạn";
+
+    subtitle.textContent = "Chào " + displayName + "! Đây là gợi ý cho ngân sách \"" + budgetLabels[selections.budget] + "\"";
+
+    if(items && items.length){
+      list.innerHTML = items.map((item, i) =>
+        '<li class="gift-item"><label class="gift-check">' +
+          '<input type="checkbox" class="gift-checkbox" data-index="' + i + '">' +
+          '<span class="idx">' + String(i+1).padStart(2,'0') + '</span>' +
+          '<span class="gift-text">' + item + '</span>' +
+        '</label></li>'
+      ).join('');
+    } else {
+      list.innerHTML = '<li class="gift-empty">Combo này đang được cập nhật, quay lại sau nhé 🎁</li>';
+    }
+
+    if(selections.budget === 'lollipop'){
+      extra.innerHTML =
+        '<div class="qr-block">' +
+          '<img src="data:image/png;base64,' + QR_BASE64 + '" alt="QR chuyển khoản">' +
+          '<div class="qr-caption">quét mã là xong luôn</div>' +
+        '</div>';
+    } else {
+      extra.innerHTML = '';
+    }
+  }
+
+  // ---------- TOAST ----------
+  function showToast(message){
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 1600);
+  }
+
+  // ---------- SUMMARY (after clicking Done) ----------
+  function renderSummary(){
+    const checked = Array.from(document.querySelectorAll('#giftList .gift-checkbox:checked'));
+    const items = checked.map(cb => cb.closest('.gift-check').querySelector('.gift-text').textContent);
+    const list = document.getElementById('summaryList');
+    const subtitle = document.getElementById('summarySubtitle');
+    const displayName = selections.name && selections.name.trim() ? selections.name.trim() : "bạn";
+
+    subtitle.textContent = "Cảm ơn " + displayName + "! Đây là những món bạn đã nhận:";
+
+    if(items.length){
+      list.innerHTML = items.map((item, i) =>
+        '<li class="gift-item static"><span class="idx">' + String(i+1).padStart(2,'0') + '</span><span class="gift-text">' + item + '</span></li>'
+      ).join('');
+    } else {
+      list.innerHTML = '<li class="gift-empty">Bạn chưa tick món nào cả — quay lại chọn thử xem!</li>';
+    }
+  }
+
+  document.getElementById('doneBtn').addEventListener('click', () => {
+    renderSummary();
+    goTo('summary');
+  });
+
+  // ---------- NAME INPUT ----------
+  const nameInput = document.getElementById('nameInput');
+  const nameNextBtn = document.getElementById('nameNextBtn');
+
+  nameInput.addEventListener('input', () => {
+    nameNextBtn.disabled = nameInput.value.trim().length === 0;
+  });
+
+  nameNextBtn.addEventListener('click', () => {
+    if(nameInput.value.trim().length === 0) return;
+    selections.name = nameInput.value.trim();
+    goTo('budget');
+  });
+
+  nameInput.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' && !nameNextBtn.disabled) nameNextBtn.click();
+  });
+
+  // ---------- OPTION SELECTION (budget) ----------
+  document.querySelectorAll('.option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const list = opt.closest('.option-list');
+      const group = list.dataset.group;
+      list.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selections[group] = opt.dataset.value;
+      if(group === 'budget') document.getElementById('budgetNextBtn').disabled = false;
+    });
+  });
+
+  document.getElementById('budgetNextBtn').addEventListener('click', () => {
+    if(!selections.budget) return;
+    renderResult();
+    goTo('result');
+    applyClaimsToList();
+  });
+
+  // ---------- THEME TOGGLE ----------
+  const themeToggle = document.getElementById('themeToggle');
+  const htmlEl = document.documentElement;
+  const sunPath = "M12 3a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0V4a1 1 0 0 1 1-1Zm0 15a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0v-1a1 1 0 0 1 1-1ZM4 11a1 1 0 0 1 1 1 1 1 0 1 1-2 0 1 1 0 0 1 1-1Zm15 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2ZM5.6 5.6a1 1 0 0 1 1.4 0l.7.7A1 1 0 1 1 6.3 7.7l-.7-.7a1 1 0 0 1 0-1.4Zm10.7 10.7a1 1 0 0 1 1.4 0l.7.7a1 1 0 0 1-1.4 1.4l-.7-.7a1 1 0 0 1 0-1.4ZM18.4 5.6a1 1 0 0 1 0 1.4l-.7.7a1 1 0 1 1-1.4-1.4l.7-.7a1 1 0 0 1 1.4 0ZM7.7 16.3a1 1 0 0 1 0 1.4l-.7.7a1 1 0 0 1-1.4-1.4l.7-.7a1 1 0 0 1 1.4 0ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z";
+  const moonPath = "M20.7 14.6a8.5 8.5 0 0 1-10.3-10.3.6.6 0 0 0-.8-.7A9.5 9.5 0 1 0 21.4 15.4a.6.6 0 0 0-.7-.8Z";
+  const themeIconPath = document.querySelector('#themeIcon path');
+
+  function applyTheme(theme){
+    htmlEl.setAttribute('data-theme', theme);
+    themeIconPath.setAttribute('d', theme === 'dark' ? moonPath : sunPath);
+  }
+
+  themeToggle.addEventListener('click', () => {
+    const next = htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+  });
+
+  applyTheme('dark');
+
+  // ---------- SPOTIFY MODAL ----------
+  const spotifyFab = document.getElementById('spotifyFab');
+  const spotifyModal = document.getElementById('spotifyModal');
+  const spotifyClose = document.getElementById('spotifyClose');
+  const spotifyInput = document.getElementById('spotifyInput');
+  const spotifyPlayBtn = document.getElementById('spotifyPlayBtn');
+  const spotifyError = document.getElementById('spotifyError');
+  const spotifyEmbedWrap = document.getElementById('spotifyEmbedWrap');
+
+  spotifyFab.addEventListener('click', () => spotifyModal.classList.add('active'));
+  spotifyClose.addEventListener('click', () => spotifyModal.classList.remove('active'));
+  spotifyModal.addEventListener('click', (e) => { if(e.target === spotifyModal) spotifyModal.classList.remove('active'); });
+
+  function parseSpotifyUrl(url){
+    const match = url.match(/open\.spotify\.com\/(?:intl-\w+\/)?(track|album|playlist|episode|show|artist)\/([a-zA-Z0-9]+)/);
+    if(!match) return null;
+    return { type: match[1], id: match[2] };
+  }
+
+  function loadSpotifyEmbed(){
+    const url = spotifyInput.value.trim();
+    const parsed = parseSpotifyUrl(url);
+    if(!parsed){
+      spotifyError.style.display = 'block';
+      spotifyEmbedWrap.innerHTML = '';
+      return;
+    }
+    spotifyError.style.display = 'none';
+    const height = (parsed.type === 'track' || parsed.type === 'episode') ? 152 : 352;
+    const src = "https://open.spotify.com/embed/" + parsed.type + "/" + parsed.id + "?utm_source=generator";
+    spotifyEmbedWrap.innerHTML =
+      '<iframe src="' + src + '" width="100%" height="' + height + '" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>';
+  }
+
+  spotifyPlayBtn.addEventListener('click', loadSpotifyEmbed);
+  spotifyInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') loadSpotifyEmbed(); });
+
+  // ========================================================================
+  // ACCOUNT MODAL (login / signup)
+  // ========================================================================
+  const accountBtn = document.getElementById('accountBtn');
+  const accountModal = document.getElementById('accountModal');
+  const accountClose = document.getElementById('accountClose');
+  const accountModalTitle = document.getElementById('accountModalTitle');
+  const tabLogin = document.getElementById('tabLogin');
+  const tabSignup = document.getElementById('tabSignup');
+  const signupNameRow = document.getElementById('signupNameRow');
+  const authName = document.getElementById('authName');
+  const authEmail = document.getElementById('authEmail');
+  const authPassword = document.getElementById('authPassword');
+  const authError = document.getElementById('authError');
+  const authSubmitBtn = document.getElementById('authSubmitBtn');
+  const authForm = document.getElementById('authForm');
+  const authLoggedIn = document.getElementById('authLoggedIn');
+  const loggedInHint = document.getElementById('loggedInHint');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  let authMode = 'login'; // 'login' | 'signup'
+
+  function setAuthMode(mode){
+    authMode = mode;
+    tabLogin.classList.toggle('active', mode === 'login');
+    tabSignup.classList.toggle('active', mode === 'signup');
+    signupNameRow.style.display = mode === 'signup' ? 'block' : 'none';
+    authSubmitBtn.textContent = mode === 'signup' ? 'Đăng ký' : 'Đăng nhập';
+    accountModalTitle.textContent = mode === 'signup' ? 'Đăng ký' : 'Đăng nhập';
+    authError.style.display = 'none';
+  }
+
+  tabLogin.addEventListener('click', () => setAuthMode('login'));
+  tabSignup.addEventListener('click', () => setAuthMode('signup'));
+
+  accountBtn.addEventListener('click', () => accountModal.classList.add('active'));
+  accountClose.addEventListener('click', () => accountModal.classList.remove('active'));
+  accountModal.addEventListener('click', (e) => { if(e.target === accountModal) accountModal.classList.remove('active'); });
+
+  function showAuthError(msg){
+    authError.textContent = msg;
+    authError.style.display = 'block';
+  }
+
+  authSubmitBtn.addEventListener('click', async () => {
+    const email = authEmail.value.trim();
+    const password = authPassword.value;
+
+    if(!email || !password){
+      showAuthError('Nhập đủ email và mật khẩu nhé.');
+      return;
+    }
+
+    try{
+      if(authMode === 'signup'){
+        const name = authName.value.trim();
+        if(!name){ showAuthError('Nhập tên hiển thị nhé.'); return; }
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(cred.user, { displayName: name });
+        await setDoc(doc(db, 'users', cred.user.uid), {
+          name, email, createdAt: serverTimestamp()
+        });
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
+      accountModal.classList.remove('active');
+      authEmail.value = ''; authPassword.value = ''; authName.value = '';
+    } catch(err){
+      showAuthError(err.message.replace('Firebase: ', ''));
+    }
+  });
+
+  logoutBtn.addEventListener('click', async () => {
+    await signOut(auth);
+    accountModal.classList.remove('active');
+  });
+
+  onAuthStateChanged(auth, (user) => {
+    currentUser = user;
+    if(user){
+      currentUserName = user.displayName || (user.email ? user.email.split('@')[0] : 'bạn');
+      accountBtn.textContent = currentUserName;
+      authForm.style.display = 'none';
+      authLoggedIn.style.display = 'block';
+      loggedInHint.textContent = 'Đang đăng nhập với ' + currentUserName + '.';
+      // if a name hasn't been typed yet on the "how should I call you" step, prefill it
+      if(nameInput && !nameInput.value.trim()){
+        nameInput.value = currentUserName;
+        nameNextBtn.disabled = false;
+      }
+    } else {
+      currentUserName = null;
+      accountBtn.textContent = 'Đăng nhập';
+      authForm.style.display = 'block';
+      authLoggedIn.style.display = 'none';
+      setAuthMode('login');
+    }
+  });
+
+  // ========================================================================
+  // GIFT CLAIMS SYNC (Firestore) — so multiple visitors don't pick the same gift
+  // Doc id format: "<budget>__<index>"
+  // ========================================================================
+  async function loadClaimsForBudget(budget){
+    const claimsMap = {};
+    try{
+      const q = query(collection(db, 'claims'), where('budget', '==', budget));
+      const snap = await getDocs(q);
+      snap.forEach(d => { claimsMap[d.data().index] = d.data(); });
+    } catch(err){
+      console.warn('Không tải được claims (kiểm tra lại cấu hình Firebase):', err.message);
+    }
+    return claimsMap;
+  }
+
+  async function applyClaimsToList(){
+    const budget = selections.budget;
+    const claims = await loadClaimsForBudget(budget);
+    document.querySelectorAll('#giftList .gift-check').forEach((row) => {
+      const cb = row.querySelector('.gift-checkbox');
+      const idx = Number(cb.dataset.index);
+      const claim = claims[idx];
+      let noteEl = row.querySelector('.claim-note');
+      if(claim){
+        cb.checked = true;
+        const isMine = currentUser && claim.claimedByUid === currentUser.uid;
+        cb.disabled = !isMine;
+        if(!noteEl){
+          noteEl = document.createElement('span');
+          noteEl.className = 'claim-note';
+          row.appendChild(noteEl);
+        }
+        noteEl.textContent = '— đã chọn bởi ' + claim.claimedByName;
+      } else {
+        cb.disabled = false;
+        if(noteEl) noteEl.remove();
+      }
+    });
+  }
+
+  async function setClaim(budget, index, itemText, claimed){
+    const ref = doc(db, 'claims', budget + '__' + index);
+    if(claimed){
+      await setDoc(ref, {
+        budget, index, itemText,
+        claimedByUid: currentUser.uid,
+        claimedByName: currentUserName,
+        claimedAt: serverTimestamp()
+      });
+    } else {
+      await deleteDoc(ref);
+    }
+  }
+
+  document.getElementById('giftList').addEventListener('change', async (e) => {
+    if(!e.target.classList.contains('gift-checkbox')) return;
+    const cb = e.target;
+
+    if(!currentUser){
+      cb.checked = false;
+      showToast('Đăng nhập để chọn quà');
+      accountModal.classList.add('active');
+      return;
+    }
+
+    const idx = Number(cb.dataset.index);
+    const itemText = cb.closest('.gift-check').querySelector('.gift-text').textContent;
+
+    try{
+      await setClaim(selections.budget, idx, itemText, cb.checked);
+      if(cb.checked) showToast('Assigned');
+      applyClaimsToList();
+    } catch(err){
+      cb.checked = !cb.checked;
+      showToast('Lỗi kết nối, thử lại nhé');
+      console.error(err);
+    }
+  });
+</script>
+
+</body>
+</html>
